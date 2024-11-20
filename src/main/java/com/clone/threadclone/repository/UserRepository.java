@@ -9,4 +9,6 @@ import com.clone.threadclone.model.User;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     boolean existsByEmail(String email);
+
+    User findByEmail(String username);
 }

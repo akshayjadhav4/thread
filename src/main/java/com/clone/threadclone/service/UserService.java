@@ -11,4 +11,6 @@ public interface UserService {
     User createUser(CreateUserRequest request);
 
     User updateUser(UpdateUserRequest request, Long userId);
+
+    User getAuthenticatedUser();
 }

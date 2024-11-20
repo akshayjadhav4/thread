@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RequiredArgsConstructor
@@ -36,16 +35,6 @@ public class UserController {
             return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, userMapper.mapTo(user)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
-        }
-    }
-
-    @PostMapping("/")
-    public ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserRequest request) {
-        try {
-            User user = userService.createUser(request);
-            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, userMapper.mapTo(user)));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
