@@ -1,5 +1,7 @@
 package com.clone.threadclone.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "images")
+@Table(name = "media")
 public class Media {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +35,7 @@ public class Media {
     @Enumerated(EnumType.STRING)
     private MediaType type;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "thread_id", nullable = false)
     private Thread thread;
