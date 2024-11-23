@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clone.threadclone.dto.UserDto;
 import com.clone.threadclone.mapper.Mapper;
 import com.clone.threadclone.model.User;
-import com.clone.threadclone.request.CreateUserRequest;
 import com.clone.threadclone.request.UpdateUserRequest;
 import com.clone.threadclone.response.ApiResponse;
 import com.clone.threadclone.service.UserService;
