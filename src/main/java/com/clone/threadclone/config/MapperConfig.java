@@ -33,7 +33,7 @@ public class MapperConfig {
 
     private static final List<String> PUBLIC_URLS = List.of(
             "/api/v1/auth/register",
-            "/api/v1/auth/login");
+            "/api/v1/auth/login", "/error");
 
     @Bean
     public ModelMapper modelMapper() {
