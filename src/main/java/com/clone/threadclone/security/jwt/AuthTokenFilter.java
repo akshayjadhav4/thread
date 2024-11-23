@@ -47,9 +47,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         } catch (JwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(e.getMessage() + " : Invalid token. Please login and try again.");
+            return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write(e.getMessage());
+            return;
         }
         filterChain.doFilter(request, response);
     }
