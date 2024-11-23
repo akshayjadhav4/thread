@@ -145,6 +145,12 @@ public class ThreadServiceImpl implements ThreadService {
 
     @Override
     public void deleteThread(Long threadId) {
+        Thread thread = threadRepository.findById(threadId)
+                .orElseThrow(() -> new ThreadNotFoundException("Thread not found " + threadId));
+        User currentUser = getAuthenticatedUser();
+        if (!thread.getUser().equals(currentUser)) {
+            throw new AccessDeniedException("You are not authorized to delete this thread");
+        }
         threadRepository.deleteById(threadId);
     }
 
