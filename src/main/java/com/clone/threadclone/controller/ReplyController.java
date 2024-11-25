@@ -43,7 +43,7 @@ public class ReplyController {
     }
 
     @GetMapping(path = "/list")
-    public ResponseEntity<ApiResponse> getRepliesForThread(@RequestParam(required = false) Long threadId,
+    public ResponseEntity<ApiResponse> getReplies(@RequestParam(required = false) Long threadId,
             @RequestParam(required = false) Long replyId,
             @RequestParam(required = false) Boolean includeThreadDetails,
             Pageable pageable) {
