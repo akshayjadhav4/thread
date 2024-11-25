@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clone.threadclone.dto.ThreadDto;
+import com.clone.threadclone.mapper.Mapper;
 import com.clone.threadclone.model.Thread;
 import com.clone.threadclone.request.CreateThreadRequest;
 import com.clone.threadclone.request.UpdateThreadRequest;
@@ -28,12 +30,14 @@ import lombok.RequiredArgsConstructor;
 public class ThreadController {
 
     private final ThreadService threadService;
+    private final Mapper<Thread, ThreadDto> threadMapper;
+    private static final String SUCCESS_MESSAGE = "Threads fetched successfully";
 
     @PostMapping("/")
     public ResponseEntity<ApiResponse> createThread(@RequestBody CreateThreadRequest request) {
         try {
             Thread thread = threadService.createThread(request);
-            return ResponseEntity.ok(new ApiResponse("Thread Created", thread));
+            return ResponseEntity.ok(new ApiResponse("Thread Created", threadMapper.mapTo(thread)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), null));
         }
@@ -43,7 +47,7 @@ public class ThreadController {
     public ResponseEntity<ApiResponse> getThreadById(@PathVariable Long threadId) {
         try {
             Thread thread = threadService.getThreadById(threadId);
-            return ResponseEntity.ok(new ApiResponse("Success", thread));
+            return ResponseEntity.ok(new ApiResponse("Success", threadMapper.mapTo(thread)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -63,7 +67,8 @@ public class ThreadController {
     public ResponseEntity<ApiResponse> getAllThreads(Pageable pageable) {
         try {
             Page<Thread> threads = threadService.getAllThreads(pageable);
-            return ResponseEntity.ok(new ApiResponse("Threads fetched successfully", threads));
+            return ResponseEntity
+                    .ok(new ApiResponse(SUCCESS_MESSAGE, threads.map(threadMapper::mapTo)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -73,7 +78,7 @@ public class ThreadController {
     public ResponseEntity<ApiResponse> getThreadsByUser(@PathVariable Long userId, Pageable pageable) {
         try {
             Page<Thread> threads = threadService.getThreadsByUser(userId, pageable);
-            return ResponseEntity.ok(new ApiResponse("Threads fetched successfully", threads));
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, threads.map(threadMapper::mapTo)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -83,7 +88,7 @@ public class ThreadController {
     public ResponseEntity<ApiResponse> getThreadsByHashtag(@PathVariable String hashtag, Pageable pageable) {
         try {
             Page<Thread> threads = threadService.getThreadsByHashtag("#" + hashtag, pageable);
-            return ResponseEntity.ok(new ApiResponse("Threads fetched successfully", threads));
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, threads.map(threadMapper::mapTo)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -94,7 +99,7 @@ public class ThreadController {
             @RequestBody UpdateThreadRequest request) {
         try {
             Thread thread = threadService.editThread(threadId, request);
-            return ResponseEntity.ok(new ApiResponse("Edit successful.", thread));
+            return ResponseEntity.ok(new ApiResponse("Edit successful.", threadMapper.mapTo(thread)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), null));
         }

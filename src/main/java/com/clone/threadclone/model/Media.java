@@ -35,7 +35,6 @@ public class Media {
     @Enumerated(EnumType.STRING)
     private MediaType type;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "thread_id", nullable = false)
     private Thread thread;

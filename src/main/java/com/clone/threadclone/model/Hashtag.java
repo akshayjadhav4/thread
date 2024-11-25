@@ -31,7 +31,6 @@ public class Hashtag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThreadHashtag> threadHashtags;
 
