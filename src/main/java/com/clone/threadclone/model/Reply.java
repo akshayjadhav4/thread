@@ -36,7 +36,7 @@ public class Reply {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "thread_id", nullable = false)
+    @JoinColumn(name = "thread_id")
     private Thread thread;
 
     @ManyToOne
