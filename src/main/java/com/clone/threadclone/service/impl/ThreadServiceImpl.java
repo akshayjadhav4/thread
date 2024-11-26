@@ -11,12 +11,9 @@ import java.util.stream.StreamSupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.clone.threadclone.exceptions.ThreadNotFoundException;
-import com.clone.threadclone.exceptions.UserNotFoundException;
 import com.clone.threadclone.helpers.Helpers;
 import com.clone.threadclone.model.Hashtag;
 import com.clone.threadclone.model.Media;
@@ -27,10 +24,10 @@ import com.clone.threadclone.model.Media.MediaType;
 import com.clone.threadclone.repository.HashtagRepository;
 import com.clone.threadclone.repository.ThreadHashtagRepository;
 import com.clone.threadclone.repository.ThreadRepository;
-import com.clone.threadclone.repository.UserRepository;
 import com.clone.threadclone.request.CreateThreadRequest;
 import com.clone.threadclone.request.UpdateThreadRequest;
 import com.clone.threadclone.service.ThreadService;
+import com.clone.threadclone.service.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +37,13 @@ import lombok.RequiredArgsConstructor;
 public class ThreadServiceImpl implements ThreadService {
 
     private final ThreadRepository threadRepository;
-    private final UserRepository userRepository;
     private final HashtagRepository hashtagRepository;
     private final ThreadHashtagRepository threadHashtagRepository;
+    private final UserService userService;
 
     @Override
     public Thread createThread(CreateThreadRequest request) {
-        User user = getAuthenticatedUser();
+        User user = userService.getAuthenticatedUser();
         Thread thread = new Thread();
         thread.setContent(request.getContent());
         if (request.getMedia() != null && !request.getMedia().isEmpty()) {
@@ -71,16 +68,6 @@ public class ThreadServiceImpl implements ThreadService {
             processHashtags(hashtags, savedThread);
         }
         return savedThread;
-    }
-
-    private User getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UserNotFoundException("Authenticated user not found.");
-        }
-        return user;
     }
 
     private boolean isValidMediaType(String url, MediaType type) {
@@ -147,7 +134,7 @@ public class ThreadServiceImpl implements ThreadService {
     public void deleteThread(Long threadId) {
         Thread thread = threadRepository.findById(threadId)
                 .orElseThrow(() -> new ThreadNotFoundException("Thread not found " + threadId));
-        User currentUser = getAuthenticatedUser();
+        User currentUser = userService.getAuthenticatedUser();
         if (!thread.getUser().equals(currentUser)) {
             throw new AccessDeniedException("You are not authorized to delete this thread");
         }
@@ -174,7 +161,7 @@ public class ThreadServiceImpl implements ThreadService {
     public Thread editThread(Long threadId, UpdateThreadRequest request) {
         Thread existingThread = threadRepository.findById(threadId)
                 .orElseThrow(() -> new ThreadNotFoundException("Thread not found"));
-        User currentUser = getAuthenticatedUser();
+        User currentUser = userService.getAuthenticatedUser();
         if (!existingThread.getUser().equals(currentUser)) {
             throw new AccessDeniedException("You are not authorized to edit this thread");
         }
