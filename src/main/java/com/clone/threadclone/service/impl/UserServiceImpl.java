@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.clone.threadclone.exceptions.UserNotFoundException;
 import com.clone.threadclone.model.User;
 import com.clone.threadclone.repository.UserRepository;
 import com.clone.threadclone.request.CreateUserRequest;
@@ -59,7 +60,11 @@ public class UserServiceImpl implements UserService {
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("Authenticated user not found.");
+        }
+        return user;
     }
 
 }

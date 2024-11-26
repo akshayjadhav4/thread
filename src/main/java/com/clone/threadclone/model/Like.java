@@ -30,11 +30,11 @@ public class Like {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "thread_id", nullable = false)
+    @JoinColumn(name = "thread_id")
     private Thread thread;
 
     @ManyToOne
-    @JoinColumn(name = "reply_id", nullable = false)
+    @JoinColumn(name = "reply_id")
     private Reply reply;
 
     private LocalDateTime createdAt = LocalDateTime.now();
