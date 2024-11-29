@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}/users")
+@RequestMapping("${api.prefix}/user")
 public class UserController {
 
     private final UserService userService;
