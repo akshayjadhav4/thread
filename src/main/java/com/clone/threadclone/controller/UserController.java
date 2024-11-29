@@ -15,8 +15,12 @@ import com.clone.threadclone.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,6 +46,46 @@ public class UserController {
         try {
             User user = userService.updateUser(request, userId);
             return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, userMapper.mapTo(user)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("/follow/{followedId}")
+    public ResponseEntity<ApiResponse> followUser(@PathVariable Long followedId) {
+        try {
+            String response = userService.followUser(followedId);
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("/unfollow/{followedId}")
+    public ResponseEntity<ApiResponse> unfollowUser(@PathVariable Long followedId) {
+        try {
+            String response = userService.unfollowUser(followedId);
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/followers/{userId}")
+    public ResponseEntity<ApiResponse> getFollowers(@PathVariable Long userId, Pageable pageable) {
+        try {
+            Page<User> followers = userService.getFollowers(userId, pageable);
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, followers.map(userMapper::mapTo)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/following/{userId}")
+    public ResponseEntity<ApiResponse> getFollowing(@PathVariable Long userId, Pageable pageable) {
+        try {
+            Page<User> followers = userService.getFollowing(userId, pageable);
+            return ResponseEntity.ok(new ApiResponse(SUCCESS_MESSAGE, followers.map(userMapper::mapTo)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }

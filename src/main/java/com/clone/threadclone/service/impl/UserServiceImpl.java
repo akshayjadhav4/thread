@@ -2,6 +2,8 @@ package com.clone.threadclone.service.impl;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import com.clone.threadclone.request.CreateUserRequest;
 import com.clone.threadclone.request.UpdateUserRequest;
 import com.clone.threadclone.service.UserService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -65,6 +68,45 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("Authenticated user not found.");
         }
         return user;
+    }
+
+    @Override
+    @Transactional
+    public String followUser(Long followedId) {
+
+        User follower = getAuthenticatedUser();
+        User followed = userRepository.findById(followedId)
+                .orElseThrow(() -> new RuntimeException("Followed user not found"));
+        if (follower.getId().equals(followedId)) {
+            return "You can't follow yourself. Try making some friends instead.";
+        } else if (follower.getFollowing().contains(followed)) {
+            return "You are already following this user.";
+        }
+        userRepository.followUser(follower.getId(), followedId);
+        return "Successfully followed user!";
+    }
+
+    @Override
+    @Transactional
+    public String unfollowUser(Long followedId) {
+        User follower = getAuthenticatedUser();
+        User followed = userRepository.findById(followedId)
+                .orElseThrow(() -> new RuntimeException("Followed user not found"));
+        if (!follower.getFollowing().contains(followed)) {
+            return "You are not following this user.";
+        }
+        userRepository.unfollowUser(follower.getId(), followedId);
+        return "Successfully unfollowed user!";
+    }
+
+    @Override
+    public Page<User> getFollowers(Long userId, Pageable pageable) {
+        return userRepository.findFollowersByUserId(userId, pageable);
+    }
+
+    @Override
+    public Page<User> getFollowing(Long userId, Pageable pageable) {
+        return userRepository.findFollowingByUserId(userId, pageable);
     }
 
 }
