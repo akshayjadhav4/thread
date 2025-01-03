@@ -18,4 +18,6 @@ public class ThreadDto {
 
     private List<MediaDto> medias;
 
+    private int likeCount;
+
 }

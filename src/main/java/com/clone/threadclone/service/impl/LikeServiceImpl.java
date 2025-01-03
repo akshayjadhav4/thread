@@ -1,5 +1,7 @@
 package com.clone.threadclone.service.impl;
 
+import com.clone.threadclone.kafka.producer.ProducerLikes;
+import com.clone.threadclone.service.RedisLikeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ public class LikeServiceImpl implements LikeService {
     private final ThreadRepository threadRepository;
     private final ReplyRepository replyRepository;
     private final UserService userService;
+    private  final RedisLikeService redisLikeService;
+    private  final ProducerLikes producerLikes;
 
     @Override
     public int likeThread(Long threadId) {
@@ -51,8 +55,9 @@ public class LikeServiceImpl implements LikeService {
         like.setThread(thread);
         likeRepository.save(like);
 
-        // Return the total count of likes for the thread
-        return likeRepository.countByThreadId(threadId);
+        producerLikes.sendThreadLike(threadId, user.getId());
+        // Return the total count of likes for the thread from cache
+        return redisLikeService.getThreadLikesCount(threadId);
     }
 
     @Override
@@ -69,9 +74,9 @@ public class LikeServiceImpl implements LikeService {
 
         // Delete the like
         likeRepository.delete(like);
-
-        // Return the updated total count of likes for the thread
-        return likeRepository.countByThreadId(threadId);
+        producerLikes.sendThreadUnlike(threadId, user.getId());
+        // Return the updated total count of likes for the thread from cache
+        return redisLikeService.getThreadLikesCount(threadId);
     }
 
     @Override
@@ -96,9 +101,9 @@ public class LikeServiceImpl implements LikeService {
         like.setUser(user);
         like.setReply(reply);
         likeRepository.save(like);
-
+        producerLikes.sendReplyLike(replyId, user.getId());
         // Return the total count of likes for the reply
-        return likeRepository.countByReplyId(replyId);
+        return redisLikeService.getReplyLikesCount(replyId);
     }
 
     @Override
@@ -115,9 +120,9 @@ public class LikeServiceImpl implements LikeService {
 
         // Delete the like
         likeRepository.delete(like);
-
+        producerLikes.sendReplyUnlike(replyId, user.getId());
         // Return the updated total count of likes for the reply
-        return likeRepository.countByThreadId(replyId);
+        return  redisLikeService.getReplyLikesCount(replyId);
     }
 
     @Override

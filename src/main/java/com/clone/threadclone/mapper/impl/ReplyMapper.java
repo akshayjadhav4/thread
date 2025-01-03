@@ -1,5 +1,6 @@
 package com.clone.threadclone.mapper.impl;
 
+import com.clone.threadclone.service.RedisLikeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +12,12 @@ import com.clone.threadclone.model.Reply;
 @Component
 public class ReplyMapper {
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final RedisLikeService redisLikeService;
 
-    public ReplyMapper(ModelMapper modelMapper) {
+    public ReplyMapper(ModelMapper modelMapper, RedisLikeService redisLikeService) {
         this.modelMapper = modelMapper;
+        this.redisLikeService = redisLikeService;
     }
 
     public ReplyDto mapTo(Reply replyEntity, boolean includeThreadDetails) {
@@ -25,7 +28,7 @@ public class ReplyMapper {
 
             dto = modelMapper.map(replyEntity, ReplyDto.class);
         }
-        int likeCount = replyEntity.getLikes() != null ? replyEntity.getLikes().size() : 0;
+        int likeCount = redisLikeService.getReplyLikesCount(dto.getId());
         dto.setLikeCount(likeCount);
         return dto;
     }
