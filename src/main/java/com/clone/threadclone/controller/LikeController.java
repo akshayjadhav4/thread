@@ -1,5 +1,6 @@
 package com.clone.threadclone.controller;
 
+import com.clone.threadclone.kafka.producer.ProduceThreadLike;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,14 @@ public class LikeController {
 
     private final LikeService likeService;
 
+    private  final ProduceThreadLike produceThreadLike;
+
     private final Mapper<Like, LikeDto> likeMapper;
 
     @PostMapping("/thread/{threadId}")
     public ResponseEntity<ApiResponse> likeThread(@PathVariable Long threadId) {
         try {
+            produceThreadLike.sendLike("Like for thread ID" + threadId);
             int likeCount = likeService.likeThread(threadId);
             LikeResponse response = new LikeResponse(likeCount, threadId, null);
             return ResponseEntity.ok(new ApiResponse("Thread liked successfully", response));
